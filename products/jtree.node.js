@@ -3211,7 +3211,7 @@ TreeNode.iris = `sepal_length,sepal_width,petal_length,petal_width,species
 4.9,2.5,4.5,1.7,virginica
 5.1,3.5,1.4,0.2,setosa
 5,3.4,1.5,0.2,setosa`
-TreeNode.getVersion = () => "54.0.0"
+TreeNode.getVersion = () => "54.1.0"
 class AbstractExtendibleTreeNode extends TreeNode {
   _getFromExtended(firstWordPath) {
     const hit = this._getNodeFromExtended(firstWordPath)
@@ -3375,6 +3375,7 @@ var GrammarConstants
   GrammarConstants["pattern"] = "pattern"
   GrammarConstants["inScope"] = "inScope"
   GrammarConstants["cells"] = "cells"
+  GrammarConstants["contentDelimiter"] = "contentDelimiter"
   GrammarConstants["contentKey"] = "contentKey"
   GrammarConstants["childrenKey"] = "childrenKey"
   GrammarConstants["uniqueFirstWord"] = "uniqueFirstWord"
@@ -3779,6 +3780,9 @@ class GrammarBackedNode extends TreeNode {
     const str = compiler[GrammarConstantsCompiler.stringTemplate]
     return str !== undefined ? TreeUtils.formatStr(str, catchAllCellDelimiter, Object.assign(this._getFields(), this.cells)) : this.getLine()
   }
+  get contentDelimiter() {
+    return this.getDefinition()._getFromExtended(GrammarConstants.contentDelimiter)
+  }
   get contentKey() {
     return this.getDefinition()._getFromExtended(GrammarConstants.contentKey)
   }
@@ -3793,21 +3797,26 @@ class GrammarBackedNode extends TreeNode {
   }
   get typedContent() {
     const cells = this._getParsedCells()
+    // todo: probably a better way to do this, perhaps by defining a cellDelimiter at the node level
+    // todo: this currently parse anything other than string types
+    if (this.contentDelimiter) return this.getContent().split(this.contentDelimiter)
     if (cells.length === 2) return cells[1].getParsed()
     return this.getContent()
   }
   get typedTuple() {
     const key = this.getFirstWord()
-    const { typedContent } = this
+    const { typedContent, contentKey, childrenKey } = this
     const hasChildren = this.length > 0
     const hasChildrenNoContent = typedContent === undefined && hasChildren
     const hasChildrenAndContent = typedContent !== undefined && hasChildren
     const shouldReturnValueAsObject = hasChildrenNoContent
-    if (this.contentKey || this.childrenKey) {
+    if (contentKey || childrenKey) {
       let obj = {}
-      if (this.childrenKey) obj[this.childrenKey] = this.childrenToString()
+      if (childrenKey) obj[childrenKey] = this.childrenToString()
       else obj = this.typedMap
-      if (this.contentKey) obj[this.contentKey] = typedContent
+      if (contentKey) {
+        obj[contentKey] = typedContent
+      }
       return [key, obj]
     }
     if (this.childrenAreTextBlob) return [key, this.childrenToString()]
@@ -4673,6 +4682,7 @@ class AbstractGrammarDefinitionNode extends AbstractExtendibleTreeNode {
       GrammarConstants.tags,
       GrammarConstants.crux,
       GrammarConstants.cruxFromId,
+      GrammarConstants.contentDelimiter,
       GrammarConstants.contentKey,
       GrammarConstants.childrenKey,
       GrammarConstants.uniqueFirstWord,
