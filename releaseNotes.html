@@ -257,6 +257,18 @@ code {
 
 <p class="scrollParagraphComponent">Here's a list of the notable changes in JTree.</p>
 
+<h3 class="scrollSectionComponent">55.0.0 2022-08-02</h3>
+<ul class="scrollUnorderedListComponent">
+<li>🎉 TreeBase: grammarDir and row dir can now be different</li>
+<li>⚠️ TreeBase: setDir and setGrammarDir must now be used instead of a constructor</li>
+<li>⚠️ TreeBase: TreeBaseFile instances have the id as key; TreeBaseFolder handles mapping to filesystem</li>
+<li>⚠️ TreeBase: grammar parsing now done at TreeBaseFile level</li>
+<li>⚠️ TreeBase: removed cellCheckWithProgressBar; removed `_getDir` (use `dir`); removed toProgram; _getGrammarPaths is now grammarFilePaths</li>
+<li>⚠️ TreeBase: typedMapShort is now typedMap</li>
+<li>⚠️ TreeBase: define fileExtension in Grammar files (or programmatically)</li>
+<li>⚠️ Grammar: toSQLiteInsertStatement now takes a string instead of function</li>
+</ul>
+
 <h3 class="scrollSectionComponent">54.2.1 2022-07-27</h3>
 <ul class="scrollUnorderedListComponent">
 <li>🏥 Utils: linkify Wikipedia urls correctly</li>
