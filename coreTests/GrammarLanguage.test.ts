@@ -110,7 +110,7 @@ testTree.jibberish = equal => {
   const defNode = program
     .getHandGrammarProgram()
     .getNodeTypeFamilyTree()
-    .getNode("topLevelNode nodeWithConstsNode nodeExpandsConstsNode")
+    .getNode("abstractTopLevelNode nodeWithConstsNode nodeExpandsConstsNode")
 
   equal(defNode.toString(), "nodeExpandsConstsNode", "family tree works")
 
@@ -127,7 +127,7 @@ testTree.jibberish = equal => {
       .getDefinition()
       .getAncestorNodeTypeIdsArray()
       .join(" "),
-    "topLevelNode nodeWithConstsNode"
+    "abstractTopLevelNode nodeWithConstsNode"
   )
 
   // Assert
@@ -176,7 +176,7 @@ missing2 true`)
       ._getAncestorsArray()
       .map((def: any) => def.getNodeTypeIdFromDefinition())
       .join(" "),
-    "h1Node abstractHtmlNode topLevelNode"
+    "h1Node abstractHtmlNode abstractTopLevelNode"
   )
 }
 
@@ -298,23 +298,20 @@ testTree.format = equal => {
   // Arrange
   const normalCode = `someLangNode
  root
-topLevelNode
- abstract
+abstractTopLevelNode
 abstractHtmlNode
- extends topLevelNode
- abstract
+ extends abstractTopLevelNode
 h1Node
  crux html.h1
  extends abstractHtmlNode
-colorPropertiesNode
- extends topLevelNode
- abstract
+abstractColorPropertiesNode
+ extends abstractTopLevelNode
 constrastNode
- extends colorPropertiesNode
+ extends abstractColorPropertiesNode
 hueNode
- extends colorPropertiesNode
+ extends abstractColorPropertiesNode
 saturationNode
- extends colorPropertiesNode`
+ extends abstractColorPropertiesNode`
   const grammarProgram = makeGrammarProgram(normalCode)
   const formatted = grammarProgram.format().toString()
   equal(formatted, normalCode, "code is already in formatted form")
@@ -324,25 +321,21 @@ testTree.formatDo = equal => {
   // Arrange
   const unsortedCode = `someLangNode
  root
- inScope topLevelNode
-topLevelNode
- abstract
+ inScope abstractTopLevelNode
+abstractTopLevelNode
 h1Node
  crux html.h1
  extends abstractHtmlNode
 abstractHtmlNode
- extends topLevelNode
- abstract
+ extends abstractTopLevelNode
 intCell`
   const sortedCode = `intCell
 someLangNode
  root
- inScope topLevelNode
-topLevelNode
- abstract
+ inScope abstractTopLevelNode
+abstractTopLevelNode
 abstractHtmlNode
- extends topLevelNode
- abstract
+ extends abstractTopLevelNode
 h1Node
  crux html.h1
  extends abstractHtmlNode`
