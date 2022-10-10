@@ -33,7 +33,7 @@
     "moment-parseformat": "^3.0.0",
     "prettier": "^1.18.2",
     "recursive-readdir-sync": "^1.0.6",
-    "scroll-cli": "^31.6.0",
+    "scroll-cli": "^35.1.0",
     "semver": "^6.1.1",
     "superagent": "^5.1.0"
   },
