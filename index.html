@@ -321,7 +321,7 @@ code {
 <li><p class="scrollParagraphComponent">Run:</p></li></ul>
 
 <code class="scrollCodeBlockComponent">npm install -g ts-node
-npm install -g .
+npm install .
 npm run test</code>
 
 <p class="scrollParagraphComponent">Jtree currently includes around 10 compiled projects (aka "products") and more than a dozen Tree Languages.</p>
@@ -336,26 +336,20 @@ console.log(tree.toString())</code>
 
 <code class="scrollCodeBlockComponent">&lt;script src="https://jtree.treenotation.org/products/jtree.browser.js" /></code>
 
-<h3 class="scrollSectionComponent">jtree command line tool</h3>
-
-<code class="scrollCodeBlockComponent">npm install -g jtree
-jtree help</code>
-
 <h4 class="scrollSectionComponent">TreeBase</h4>
 
-<code class="scrollCodeBlockComponent">npm install -g jtree
-jtree base</code>
+<p class="scrollParagraphComponent">Instructions coming soon.</p>
 
 <h4 class="scrollSectionComponent">jtree "sandbox" web app for exploring base Tree Notation</h4>
 
-<code class="scrollCodeBlockComponent">npm install -g jtree
-jtree kitchen
+<code class="scrollCodeBlockComponent">npm install .
+npm run kitchen
 open http://localhost:3333/</code>
 
 <h4 class="scrollSectionComponent">jtree "Designer" web app for building new Tree Languages</h4>
 
-<code class="scrollCodeBlockComponent">npm install -g jtree
-jtree kitchen
+<code class="scrollCodeBlockComponent">npm install .
+npm run kitchen
 open http://localhost:3333/designer</code>
 
 <h4 class="scrollSectionComponent">TreeComponentFramework for building web apps</h4>
@@ -374,7 +368,7 @@ open http://localhost:3333/designer</code>
 
 <h4 class="scrollSectionComponent">Building all tools and running tests</h4>
 
-<code class="scrollCodeBlockComponent">./builder.js produceAll
+<code class="scrollCodeBlockComponent">npm run build
 npm test</code>
 
 <h3 class="scrollSectionComponent">Monorepo</h3>
@@ -399,7 +393,7 @@ npm test</code>
 
 <h4 class="scrollSectionComponent">How to bump versions</h4>
 
-<code class="scrollCodeBlockComponent">./builder.js updateVersion NEW_NUMBER</code>
+<code class="scrollCodeBlockComponent">npm run updateVersion NEW_NUMBER</code>
 
 <h3 class="scrollSectionComponent">Alternatives Considered</h3>
 
