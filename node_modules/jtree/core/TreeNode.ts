@@ -337,6 +337,10 @@ class TreeNode extends AbstractNode {
     return words[index]
   }
 
+  get list() {
+    return this.getWordsFrom(1)
+  }
+
   protected _toHtml(indentCount: int) {
     const path = this.getPathVector().join(" ")
     const classes = {
@@ -2957,7 +2961,7 @@ class TreeNode extends AbstractNode {
     return str ? indent + str.replace(/\n/g, indent) : ""
   }
 
-  static getVersion = () => "61.2.0"
+  static getVersion = () => "61.3.0"
 
   static fromDisk(path: string): TreeNode {
     const format = this._getFileFormat(path)
