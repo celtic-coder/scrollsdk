@@ -2961,7 +2961,7 @@ class TreeNode extends AbstractNode {
     return str ? indent + str.replace(/\n/g, indent) : ""
   }
 
-  static getVersion = () => "61.3.0"
+  static getVersion = () => "61.4.0"
 
   static fromDisk(path: string): TreeNode {
     const format = this._getFileFormat(path)
@@ -2973,6 +2973,18 @@ class TreeNode extends AbstractNode {
     }
 
     return methods[format](content)
+  }
+
+  static fromFolder(folderPath: string, filepathPredicate = (filepath: string) => filepath !== ".DS_Store"): TreeNode {
+    const path = require("path")
+    const fs = require("fs")
+    const tree = new TreeNode()
+    const files = fs
+      .readdirSync(folderPath)
+      .map((filename: string) => path.join(folderPath, filename))
+      .filter((filepath: string) => !fs.statSync(filepath).isDirectory() && filepathPredicate(filepath))
+      .forEach((filePath: string) => tree.appendLineAndChildren(filePath, fs.readFileSync(filePath, "utf8")))
+    return tree
   }
 }
 
