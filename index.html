@@ -4,8 +4,8 @@
 <a href="https://github.com/publicdomaincompany/jtree/actions/workflows/didTheTestsPass.yaml"><img src="https://github.com/publicdomaincompany/jtree/actions/workflows/didTheTestsPass.yaml/badge.svg" style="width: 49%;"/></a> <a href="https://gitpod.io/#https://github.com/breck7/jtree"><img src="https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod"/ height="20" width="153"></a>
 
 
-<h3 class="scrollSectionComponent">Links</h3>
-
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">Links</h3>
+</div>
 <br><ul><li><a href="https://treenotation.org">Tree Notation Homepage</a></li>
 <li><a href="https://jtree.treenotation.org/sandbox">Tree Notation Sandbox</a></li>
 <li><a href="https://jtree.treenotation.org/designer">Tree Language Designer</a></li>
@@ -17,26 +17,26 @@
 <li><a href="https://jtree.treenotation.org/sandbox/test.html">UnitTests</a></li>
 <li><a href="https://jtree.treenotation.org/sandbox/perfTests.html">PerfTests</a></li></ul>
 
-<h4 class="scrollQuestionComponent">Who is this package built for?</h4>
-
+<div class="scrollSectionComponent"><h4 class="scrollQuestionComponent">Who is this package built for?</h4>
+</div>
 <p class="scrollParagraphComponent">Jtree is for people who want to design Tree Languages, make Tree editing tools, use TreeBase, or use the Tree Component Web Framework.</p>
 
 <p class="scrollParagraphComponent">You can think of jtree as similar to the Java Development Kit, except for Tree Notation instead of Java.</p>
 
-<h4 class="scrollQuestionComponent">How do I build a new language?</h4>
-
+<div class="scrollSectionComponent"><h4 class="scrollQuestionComponent">How do I build a new language?</h4>
+</div>
 <p class="scrollParagraphComponent">You can try the <a href="https://jtree.treenotation.org/languageChecklist.html">checklist</a>.</p>
 
-<h3 class="scrollSectionComponent">Grammar Files</h3>
-
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">Grammar Files</h3>
+</div>
 <p class="scrollParagraphComponent">Jtree contains a Tree Language called "Grammar". You can write new Grammar files to define new languages. By creating a grammar file you get a parser, a type checker, syntax highlighting, autocomplete, a compiler, and virtual machine for executing your new language. Jtree also includes a simple web Tree Language <a href="https://jtree.treenotation.org/designer">Designer</a>.</p>
 
 <p class="scrollParagraphComponent">To make your language do really interesting things, you'll want to write some code to extend your language nodes in another language that you know. Jtree lets you create new languages using just Tree Notation, Tree Notation + TypeScript, or Tree Notation + Javascript. Tree Notation and Tree Languages can be built with any language, however, not just TypeScript and Javascript. We are looking for volunteers to build libraries/sdks in other host languages.</p>
 
-<h3 class="scrollSectionComponent">Using Jtree</h3>
-
-<h4 class="scrollSectionComponent">Quick start</h4>
-
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">Using Jtree</h3>
+</div>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Quick start</h4>
+</div>
 <ul><li class="scrollParagraphComponent">Open <a href="https://gitpod.io/#https://github.com/breck7/jtree" target="_blank">https://gitpod.io/#https://github.com/breck7/jtree</a></li>
 <li class="scrollParagraphComponent">Run:</li></ul>
 
@@ -46,85 +46,85 @@ npm run test</code>
 
 <p class="scrollParagraphComponent">Jtree currently includes around 10 compiled projects (aka "products") and more than a dozen Tree Languages.</p>
 
-<h3 class="scrollSectionComponent">jtree base library for npm projects:</h3>
-
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">jtree base library for npm projects:</h3>
+</div>
 <code class="scrollCodeBlockComponent">const {jtree} = require("jtree")
 const tree = new jtree.TreeNode("hello world")
 console.log(tree.toString())</code>
 
-<h3 class="scrollSectionComponent">jtree base library for the browser:</h3>
-
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">jtree base library for the browser:</h3>
+</div>
 <code class="scrollCodeBlockComponent">&lt;script src="https://jtree.treenotation.org/products/jtree.browser.js" /></code>
 
-<h4 class="scrollSectionComponent">TreeBase</h4>
-
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">TreeBase</h4>
+</div>
 <p class="scrollParagraphComponent">Instructions coming soon.</p>
 
-<h4 class="scrollSectionComponent">jtree "sandbox" web app for exploring base Tree Notation</h4>
-
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">jtree "sandbox" web app for exploring base Tree Notation</h4>
+</div>
 <code class="scrollCodeBlockComponent">npm install .
 npm run kitchen
 open http://localhost:3333/</code>
 
-<h4 class="scrollSectionComponent">jtree "Designer" web app for building new Tree Languages</h4>
-
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">jtree "Designer" web app for building new Tree Languages</h4>
+</div>
 <code class="scrollCodeBlockComponent">npm install .
 npm run kitchen
 open http://localhost:3333/designer</code>
 
-<h4 class="scrollSectionComponent">TreeComponentFramework for building web apps</h4>
-
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">TreeComponentFramework for building web apps</h4>
+</div>
 <p class="scrollParagraphComponent">(directions coming soon)</p>
 
-<h4 class="scrollSectionComponent">Sample Languages</h4>
-
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Sample Languages</h4>
+</div>
 <p class="scrollParagraphComponent">More than 12 example Tree Languages for helping with various tasks</p>
 
 <p class="scrollParagraphComponent">See the "langs/" folder.</p>
 
-<h4 class="scrollSectionComponent"> Build Tools</h4>
-
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent"> Build Tools</h4>
+</div>
 <p class="scrollParagraphComponent">If you look at the source, you will also see a set of build tools (such as Builder and TypeScriptRewriter). These are currently undocumented and not recommended for external use.</p>
 
-<h4 class="scrollSectionComponent">Building all tools and running tests</h4>
-
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Building all tools and running tests</h4>
+</div>
 <code class="scrollCodeBlockComponent">npm run build
 npm test</code>
 
-<h3 class="scrollSectionComponent">Monorepo</h3>
-
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">Monorepo</h3>
+</div>
 <p class="scrollParagraphComponent">Jtree is a monorepo. With on average over 1 major version released each month for the past 2.5 years, it would take a lot of overhead to constantly be updating 10+ different repositories and modules every month. Once we're more confident in the theory and best practices, it might make sense to break this repo into independent modules.</p>
 
 <p class="scrollParagraphComponent">That being said, we despise unnecessary dependencies as much as anyone. If anyone wants to create some automated submodules built from the projects in this monorepo, to allow for consuming of a smaller subset of the code and dependencies in this module, feel free to do so.</p>
 
-<h4 class="scrollSectionComponent">Visualization of the code base</h4>
-
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Visualization of the code base</h4>
+</div>
 <figure class="scrollImageComponent"><a href="images/diagram.svg" target="_blank"><img src="images/diagram.svg" width="1000" height="1000" loading="lazy"></a></figure>
 
-<h3 class="scrollSectionComponent">Development Status</h3>
-
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">Development Status</h3>
+</div>
 <p class="scrollParagraphComponent">All breaking changes are mentioned in the <a href="releaseNotes.html">releaseNotes</a>. We follow semantic versioning, so breaking changes should not happen if you stay on the same major version.</p>
 
-<h3 class="scrollSectionComponent">Tree Notation Libraries in Other Languages</h3>
-
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">Tree Notation Libraries in Other Languages</h3>
+</div>
 <p class="scrollParagraphComponent">If you build a Tree Notation library/SDK in another language, let us know and we'll add a link.</p>
 
 <p class="scrollParagraphComponent">If you are working on a Tree Notation library in a new host language, feel free to post an issue or ask for help in the  TreeNotation <a href="https://reddit.com/r/treenotation">subreddit</a>.</p>
 
-<h4 class="scrollSectionComponent">How to bump versions</h4>
-
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">How to bump versions</h4>
+</div>
 <code class="scrollCodeBlockComponent">npm run updateVersion NEW_NUMBER</code>
 
-<h3 class="scrollSectionComponent">Alternatives Considered</h3>
-
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">Alternatives Considered</h3>
+</div>
 <p class="scrollParagraphComponent">This is the first Tree Notation library in existence, so there were no alternative implementations. Note and Space were predecessors to Tree Notation.</p>
 
 <p class="scrollParagraphComponent">If a better alternative low level notation to Tree Notation is possible, it has yet to be discovered.</p>
 
 <p class="scrollParagraphComponent">All that said, the important part of this repo is not the code but the design patterns. Tree Notation is very simple, and you can implement the patterns contained here in your own code without using this library. In fact, that is often the best way to use Tree Notation!</p>
 
-<h4 class="scrollSectionComponent">Editing in Sublime Text</h4>
-
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Editing in Sublime Text</h4>
+</div>
 <p class="scrollParagraphComponent">It is helpful to set <code>"goto<em>anything</em>exclude_gitignore": true</code> to ignore files in gitignore. Read more <a href="https://breckyunits.com/code/my-sublime-setttings.html">here</a>.</p>
 
 <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
