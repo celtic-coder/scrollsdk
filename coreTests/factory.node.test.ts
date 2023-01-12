@@ -1,6 +1,7 @@
 #!/usr/bin/env ts-node
 
-const { jtree } = require("../index.js")
+const { TestRacer } = require("../products/TestRacer.node.js")
+const { GrammarCompiler } = require("../products/GrammarCompiler.js")
 import { treeNotationTypes } from "../products/treeNotationTypes"
 
 const testTree: treeNotationTypes.testTree = {}
@@ -12,7 +13,7 @@ testTree.compileGrammarAndCreateProgram = equal => {
   const grammarPath = jibberishRootDir + "jibberish.grammar"
 
   // Act
-  const program = jtree.compileGrammarAndCreateProgram(programPath, grammarPath)
+  const program = GrammarCompiler.compileGrammarAndCreateProgram(programPath, grammarPath)
   const result = program.execute()
 
   // Assert
@@ -20,6 +21,6 @@ testTree.compileGrammarAndCreateProgram = equal => {
   equal(result, 42)
 }
 
-/*NODE_JS_ONLY*/ if (!module.parent) jtree.TestRacer.testSingleFile(__filename, testTree)
+/*NODE_JS_ONLY*/ if (!module.parent) TestRacer.testSingleFile(__filename, testTree)
 
 export { testTree }

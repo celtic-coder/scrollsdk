@@ -1,5 +1,3 @@
-// jtree build produce jtree.node.js
-
 import { AbstractNode } from "./AbstractNode.node"
 import { Utils } from "./Utils"
 import { treeNotationTypes } from "../products/treeNotationTypes"
@@ -2961,7 +2959,7 @@ class TreeNode extends AbstractNode {
     return str ? indent + str.replace(/\n/g, indent) : ""
   }
 
-  static getVersion = () => "62.0.0"
+  static getVersion = () => "62.1.0"
 
   static fromDisk(path: string): TreeNode {
     const format = this._getFileFormat(path)
