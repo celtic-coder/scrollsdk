@@ -35,7 +35,7 @@
     "numeral": "^2.0.6",
     "prettier": "^1.18.2",
     "recursive-readdir-sync": "^1.0.6",
-    "scroll-cli": "^52.0.0",
+    "scroll-cli": "^52.2.1",
     "semver": "^6.1.1",
     "superagent": "^5.1.0"
   },
