@@ -280,6 +280,30 @@ code {
 
 <p class="scrollParagraphComponent">Here's a list of the notable changes in JTree.</p>
 
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">63.0.0 2023-1-26</h3>
+<p class="scrollParagraphComponent">This is a major release that makes the code more modular and eliminates a lot of technical debt. In the past to simplify NodeJs+Browser isomorphism I created the <code>jtree</code> namespace and bundled everything together. This was a mistake. This release fixes that, and makes each subproject more independent. This should speed up future development.</p>
+</div>
+<ul><li class="scrollParagraphComponent">⚠️ BREAKING: Replace all <code>jtree.getVersion()</code> with <code>TreeNode.getVersion()</code></li>
+<li class="scrollParagraphComponent">⚠️ BREAKING: <code>products/TreeNotationCodeMirrorMode.js</code> is now <code>products/GrammarCodeMirrorMode.js</code></li>
+<li class="scrollParagraphComponent">⚠️ BREAKING: The bundled file <code>jtree.browser.js</code> is now deprecated. That file will be kept for now (for external links) but will no longer be updated and will be removed in a future version. Include exactly what you need.</li></ul>
+<p class="scrollParagraphComponent">Before:</p>
+<code class="scrollCodeBlockComponent">&lt;script src="../products/jtree.browser.js">&lt;/script></code>
+<p class="scrollParagraphComponent">After: (to get everything that was previously in the bundle)</p>
+<code class="scrollCodeBlockComponent">&lt;script src="../products/Utils.browser.js">&lt;/script>
+&lt;script src="../products/TreeNode.browser.js">&lt;/script>
+&lt;script src="../products/GrammarLanguage.browser.js">&lt;/script>
+&lt;script src="../products/GrammarCodeMirrorMode.browser.js">&lt;/script></code>
+
+
+<ul><li class="scrollParagraphComponent">⚠️ BREAKING: The <code>jtree</code> namespace is no more. Include exactly what you need:</li></ul>
+<p class="scrollParagraphComponent">Before:</p>
+<code class="scrollCodeBlockComponent">const {jtree} = require("jtree")
+const tree = new jtree.TreeNode("hello world")</code>
+<p class="scrollParagraphComponent">After:</p>
+<code class="scrollCodeBlockComponent">const {TreeNode} = require("jtree/products/TreeNode.js")
+const tree = new TreeNode("hello world")</code>
+
+
 <div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">62.2.0 2023-1-12</h3>
 <ul><li class="scrollParagraphComponent">🎉 removed jtree.node.js and added instructions for only importing the specific product needed directly.</li></ul>
 </div>
