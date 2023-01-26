@@ -1,37 +1,40 @@
-"use strict"
-Object.defineProperty(exports, "__esModule", { value: true })
+import { treeNotationTypes } from "../products/treeNotationTypes"
+
+/* Used for Types Only, but we want this line to remain in the combined intermediate TS program */ import * as CodeMirrorLib from "codemirror"
+
 // Adapted from https://github.com/NeekSandhu/codemirror-textmate/blob/master/src/tmToCm.ts
-var CmToken
-;(function(CmToken) {
-  CmToken["Atom"] = "atom"
-  CmToken["Attribute"] = "attribute"
-  CmToken["Bracket"] = "bracket"
-  CmToken["Builtin"] = "builtin"
-  CmToken["Comment"] = "comment"
-  CmToken["Def"] = "def"
-  CmToken["Error"] = "error"
-  CmToken["Header"] = "header"
-  CmToken["HR"] = "hr"
-  CmToken["Keyword"] = "keyword"
-  CmToken["Link"] = "link"
-  CmToken["Meta"] = "meta"
-  CmToken["Number"] = "number"
-  CmToken["Operator"] = "operator"
-  CmToken["Property"] = "property"
-  CmToken["Qualifier"] = "qualifier"
-  CmToken["Quote"] = "quote"
-  CmToken["String"] = "string"
-  CmToken["String2"] = "string-2"
-  CmToken["Tag"] = "tag"
-  CmToken["Type"] = "type"
-  CmToken["Variable"] = "variable"
-  CmToken["Variable2"] = "variable-2"
-  CmToken["Variable3"] = "variable-3"
-})(CmToken || (CmToken = {}))
+enum CmToken {
+  Atom = "atom",
+  Attribute = "attribute",
+  Bracket = "bracket",
+  Builtin = "builtin",
+  Comment = "comment",
+  Def = "def",
+  Error = "error",
+  Header = "header",
+  HR = "hr",
+  Keyword = "keyword",
+  Link = "link",
+  Meta = "meta",
+  Number = "number",
+  Operator = "operator",
+  Property = "property",
+  Qualifier = "qualifier",
+  Quote = "quote",
+  String = "string",
+  String2 = "string-2",
+  Tag = "tag",
+  Type = "type",
+  Variable = "variable",
+  Variable2 = "variable-2",
+  Variable3 = "variable-3"
+}
+
 const tmToCm = {
   comment: {
     $: CmToken.Comment
   },
+
   constant: {
     // TODO: Revision
     $: CmToken.Def,
@@ -58,6 +61,7 @@ const tmToCm = {
       }
     }
   },
+
   entity: {
     name: {
       class: {
@@ -92,6 +96,7 @@ const tmToCm = {
       }
     }
   },
+
   invalid: {
     $: CmToken.Error,
     illegal: { $: CmToken.Error },
@@ -99,6 +104,7 @@ const tmToCm = {
       $: CmToken.Error
     }
   },
+
   keyword: {
     $: CmToken.Keyword,
     operator: {
@@ -125,15 +131,18 @@ const tmToCm = {
     //     $: CodeMirrorToken.Operator,
     // },
   },
+
   storage: {
     $: CmToken.Keyword
   },
+
   string: {
     $: CmToken.String,
     regexp: {
       $: CmToken.String2
     }
   },
+
   support: {
     class: {
       $: CmToken.Def
@@ -154,6 +163,7 @@ const tmToCm = {
       }
     }
   },
+
   variable: {
     $: CmToken.Def,
     language: {
@@ -176,26 +186,43 @@ const tmToCm = {
     }
   }
 }
-const textMateScopeToCodeMirrorStyle = (scopeSegments, styleTree = tmToCm) => {
+
+const textMateScopeToCodeMirrorStyle = (scopeSegments: string[], styleTree: treeNotationTypes.stringMap = tmToCm): CmToken => {
   const matchingBranch = styleTree[scopeSegments.shift()]
   return matchingBranch ? textMateScopeToCodeMirrorStyle(scopeSegments, matchingBranch) || matchingBranch.$ || null : null
 }
-class TreeNotationCodeMirrorMode {
-  constructor(name, getProgramConstructorFn, getProgramCodeFn, codeMirrorLib = undefined) {
+
+interface treeNotationCodeMirrorState {
+  cellIndex: number
+}
+
+class GrammarCodeMirrorMode {
+  constructor(name: string, getProgramConstructorFn: () => treeNotationTypes.TreeProgramConstructor, getProgramCodeFn: (instance: CodeMirrorLib.EditorFromTextArea) => string, codeMirrorLib: typeof CodeMirrorLib = undefined) {
     this._name = name
     this._getProgramConstructorFn = getProgramConstructorFn
-    this._getProgramCodeFn = getProgramCodeFn || (instance => (instance ? instance.getValue() : this._originalValue))
+    this._getProgramCodeFn = getProgramCodeFn || (instance => (instance ? <string>instance.getValue() : this._originalValue))
     this._codeMirrorLib = codeMirrorLib
   }
+
+  private _name: string
+  private _getProgramCodeFn: (cmInstance: CodeMirrorLib.EditorFromTextArea) => string
+  private _getProgramConstructorFn: () => treeNotationTypes.TreeProgramConstructor
+  private _codeMirrorLib: typeof CodeMirrorLib
+  private _cachedSource: string
+  private _cachedProgram: treeNotationTypes.treeProgram
+  private _cmInstance: CodeMirrorLib.EditorFromTextArea
+  private _originalValue: string
+
   _getParsedProgram() {
     const source = this._getProgramCodeFn(this._cmInstance) || ""
     if (!this._cachedProgram || this._cachedSource !== source) {
       this._cachedSource = source
-      this._cachedProgram = new (this._getProgramConstructorFn())(source)
+      this._cachedProgram = new (<any>this._getProgramConstructorFn())(source)
     }
     return this._cachedProgram
   }
-  _getExcludedIntelliSenseTriggerKeys() {
+
+  private _getExcludedIntelliSenseTriggerKeys(): treeNotationTypes.stringMap {
     return {
       "8": "backspace",
       "9": "tab",
@@ -235,10 +262,12 @@ class TreeNotationCodeMirrorMode {
       "145": "scrolllock"
     }
   }
-  token(stream, state) {
+
+  token(stream: CodeMirrorLib.StringStream, state: treeNotationCodeMirrorState) {
     return this._advanceStreamAndReturnTokenType(stream, state)
   }
-  fromTextAreaWithAutocomplete(area, options) {
+
+  fromTextAreaWithAutocomplete(area: HTMLTextAreaElement, options: any) {
     this._originalValue = area.value
     const defaultOptions = {
       lineNumbers: true,
@@ -246,33 +275,40 @@ class TreeNotationCodeMirrorMode {
       tabSize: 1,
       indentUnit: 1,
       hintOptions: {
-        hint: (cmInstance, options) => this.codeMirrorAutocomplete(cmInstance, options)
+        hint: (cmInstance: CodeMirrorLib.EditorFromTextArea, options: any) => this.codeMirrorAutocomplete(cmInstance, options)
       }
     }
+
     Object.assign(defaultOptions, options)
+
     this._cmInstance = this._getCodeMirrorLib().fromTextArea(area, defaultOptions)
     this._enableAutoComplete(this._cmInstance)
     return this._cmInstance
   }
-  _enableAutoComplete(cmInstance) {
+
+  _enableAutoComplete(cmInstance: CodeMirrorLib.EditorFromTextArea) {
     const excludedKeys = this._getExcludedIntelliSenseTriggerKeys()
     const codeMirrorLib = this._getCodeMirrorLib()
-    cmInstance.on("keyup", (cm, event) => {
+    cmInstance.on("keyup", (cm: CodeMirrorLib.EditorFromTextArea, event: KeyboardEvent) => {
       // https://stackoverflow.com/questions/13744176/codemirror-autocomplete-after-any-keyup
       if (!cm.state.completionActive && !excludedKeys[event.keyCode.toString()])
         // Todo: get typings for CM autocomplete
-        codeMirrorLib.commands.autocomplete(cm, null, { completeSingle: false })
+        (<any>codeMirrorLib.commands).autocomplete(cm, null, { completeSingle: false })
     })
   }
+
   _getCodeMirrorLib() {
     return this._codeMirrorLib
   }
-  async codeMirrorAutocomplete(cmInstance, options) {
+
+  async codeMirrorAutocomplete(cmInstance: CodeMirrorLib.EditorFromTextArea, options: any) {
     const cursor = cmInstance.getDoc().getCursor()
     const codeMirrorLib = this._getCodeMirrorLib()
     const result = await this._getParsedProgram().getAutocompleteResultsAt(cursor.line, cursor.ch)
+
     // It seems to be better UX if there's only 1 result, and its the word the user entered, to close autocomplete
     if (result.matches.length === 1 && result.matches[0].text === result.word) return null
+
     return result.matches.length
       ? {
           list: result.matches,
@@ -281,19 +317,22 @@ class TreeNotationCodeMirrorMode {
         }
       : null
   }
+
   register() {
     const codeMirrorLib = this._getCodeMirrorLib()
     codeMirrorLib.defineMode(this._name, () => this)
     codeMirrorLib.defineMIME("text/" + this._name, this._name)
     return this
   }
-  _advanceStreamAndReturnTokenType(stream, state) {
+
+  private _advanceStreamAndReturnTokenType(stream: CodeMirrorLib.StringStream, state: treeNotationCodeMirrorState): string {
     let nextCharacter = stream.next()
-    const lineNumber = stream.lineOracle.line + 1 // state.lineIndex
+    const lineNumber = (<any>stream).lineOracle.line + 1 // state.lineIndex
     const WordBreakSymbol = " "
     const NodeBreakSymbol = "\n"
     while (typeof nextCharacter === "string") {
       const peek = stream.peek()
+
       if (nextCharacter === WordBreakSymbol) {
         if (peek === undefined || peek === NodeBreakSymbol) {
           stream.skipToEnd() // advance string to end
@@ -312,28 +351,35 @@ class TreeNotationCodeMirrorMode {
       }
       nextCharacter = stream.next()
     }
+
     state.cellIndex++
     const style = this._getCellStyle(lineNumber, state.cellIndex)
+
     this._incrementLine(state)
     return style
   }
-  _getCellStyle(lineIndex, cellIndex) {
+
+  private _getCellStyle(lineIndex: treeNotationTypes.int, cellIndex: treeNotationTypes.int): string {
     const program = this._getParsedProgram()
+
     // todo: if the current word is an error, don't show red?
     if (!program.getCellHighlightScopeAtPosition) console.log(program)
     const highlightScope = program.getCellHighlightScopeAtPosition(lineIndex, cellIndex)
-    const style = highlightScope ? textMateScopeToCodeMirrorStyle(highlightScope.split(".")) : undefined
+    const style = highlightScope ? <string>textMateScopeToCodeMirrorStyle(highlightScope.split(".")) : undefined
+
     return style || "noHighlightScopeDefinedInGrammar"
   }
+
   // todo: remove.
-  startState() {
+  startState(): treeNotationCodeMirrorState {
     return {
       cellIndex: 0
     }
   }
-  _incrementLine(state) {
+
+  _incrementLine(state: treeNotationCodeMirrorState) {
     state.cellIndex = 0
   }
 }
 
-module.exports = { TreeNotationCodeMirrorMode }
+export { GrammarCodeMirrorMode }

@@ -1,3 +1,10 @@
+// Compiled language parsers will include these files:
+const GlobalNamespaceAdditions = {
+  Utils: "Utils.js",
+  TreeNode: "TreeNode.js",
+  HandGrammarProgram: "GrammarLanguage.js",
+  GrammarBackedNode: "GrammarLanguage.js"
+}
 var GrammarConstantsCompiler
 ;(function(GrammarConstantsCompiler) {
   GrammarConstantsCompiler["stringTemplate"] = "stringTemplate"
@@ -1963,7 +1970,7 @@ class HandGrammarProgram extends AbstractGrammarDefinitionNode {
     if (!this.isNodeJs()) this._cache_compiledLoadedNodeTypes = Utils.appendCodeAndReturnValueOnWindow(this.toBrowserJavascript(), this.getRootNodeTypeId()).getNodeTypeMap()
     else {
       const path = require("path")
-      const code = this.toNodeJsJavascript(path.join(__dirname, "..", "index.js"))
+      const code = this.toNodeJsJavascript(__dirname)
       try {
         const rootNode = this._requireInVmNodeJsRootNodeTypeConstructor(code)
         this._cache_compiledLoadedNodeTypes = rootNode.getNodeTypeMap()
@@ -2046,10 +2053,11 @@ class HandGrammarProgram extends AbstractGrammarDefinitionNode {
   _requireInVmNodeJsRootNodeTypeConstructor(code) {
     const vm = require("vm")
     const path = require("path")
-    const jtreePath = path.join(__dirname, "..", "index.js")
     // todo: cleanup up
     try {
-      global.jtree = require(jtreePath)
+      Object.keys(GlobalNamespaceAdditions).forEach(key => {
+        global[key] = require("./" + GlobalNamespaceAdditions[key])
+      })
       global.require = require
       global.__dirname = this._dirName
       global.module = {}
@@ -2058,7 +2066,6 @@ class HandGrammarProgram extends AbstractGrammarDefinitionNode {
       // todo: figure out best error pattern here for debugging
       console.log(`Error in compiled grammar code for language "${this.getGrammarName()}"`)
       // console.log(new TreeNode(code).toStringWithLineNumbers())
-      console.log(`jtreePath: "${jtreePath}"`)
       console.log(err)
       throw err
     }
@@ -2160,7 +2167,9 @@ if (errors.length)
     files[GrammarBundleFiles.indexJs] = `module.exports = require("./${nodePath}")`
     const browserPath = `${languageName}.browser.js`
     files[browserPath] = this.toBrowserJavascript()
-    files[GrammarBundleFiles.indexHtml] = `<script src="node_modules/jtree/products/jtree.browser.js"></script>
+    files[GrammarBundleFiles.indexHtml] = `<script src="node_modules/jtree/products/Utils.browser.js"></script>
+<script src="node_modules/jtree/products/TreeNode.browser.js"></script>
+<script src="node_modules/jtree/products/GrammarLanguage.browser.js"></script>
 <script src="${browserPath}"></script>
 <script>
 const sampleCode = \`${sampleCode.toString()}\`
@@ -2276,8 +2285,8 @@ ${testCode}`
           .join(",")
       : this.getExtensionName()
   }
-  toNodeJsJavascript(normalizedJtreePath = "jtree") {
-    return this._rootNodeDefToJavascriptClass(normalizedJtreePath, true).trim()
+  toNodeJsJavascript(jtreeProductsPath = "jtree/products") {
+    return this._rootNodeDefToJavascriptClass(jtreeProductsPath, true).trim()
   }
   toBrowserJavascript() {
     return this._rootNodeDefToJavascriptClass("", false).trim()
@@ -2285,7 +2294,7 @@ ${testCode}`
   _getProperName() {
     return Utils.ucfirst(this.getExtensionName())
   }
-  _rootNodeDefToJavascriptClass(normalizedJtreePath, forNodeJs = true) {
+  _rootNodeDefToJavascriptClass(jtreeProductsPath, forNodeJs = true) {
     const defs = this.getValidConcreteAndAbstractNodeTypeDefinitions()
     // todo: throw if there is no root node defined
     const nodeTypeClasses = defs.map(def => def._nodeDefToJavascriptClass()).join("\n\n")
@@ -2302,8 +2311,9 @@ ${rootName}`
     }
     let nodeJsImports = ``
     if (forNodeJs)
-      nodeJsImports = `const {jtree} = require("${normalizedJtreePath.replace(/\\/g, "\\\\")}")
-const { Utils, TreeNode, HandGrammarProgram, GrammarBackedNode} = jtree `
+      nodeJsImports = Object.keys(GlobalNamespaceAdditions)
+        .map(key => `const { ${key} } = require("${jtreeProductsPath}/${GlobalNamespaceAdditions[key]}")`)
+        .join("\n")
     // todo: we can expose the previous "constants" export, if needed, via the grammar, which we preserve.
     return `{
 ${nodeJsImports}

@@ -5,7 +5,7 @@ import { treeNotationTypes } from "../products/treeNotationTypes"
 const { TreeNode } = require("../products/TreeNode.js")
 const { Disk } = require("../products/Disk.node.js")
 const { Utils } = require("../products/Utils.js")
-const { TestRacer } = require("../products/TestRacer.node.js")
+const { TestRacer } = require("../products/TestRacer.js")
 const { GrammarCompiler } = require("../products/GrammarCompiler.js")
 
 const testTree: treeNotationTypes.testTree = {}
@@ -58,7 +58,7 @@ testTree.diskTests = equal => {
 testTree.findProjectRoot = equal => {
   const dir = Utils.findProjectRoot(__dirname, "jtree")
   equal(typeof dir, "string")
-  equal(dir.includes("coreTests"), false, "correct parent dir selected")
+  equal(dir.includes("grammar"), false, "correct parent dir selected")
 
   try {
     const result = Utils.findProjectRoot("/foo/bar/", "jtree")

@@ -323,17 +323,19 @@ code {
 npm install .
 npm run test</code>
 
-<p class="scrollParagraphComponent">Jtree currently includes around 10 compiled projects (aka "products") and more than a dozen Tree Languages.</p>
+<p class="scrollParagraphComponent">Jtree currently includes over 10 compiled projects (aka "products") and more than a dozen Tree Languages.</p>
 
-<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">jtree base library for npm projects:</h3>
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">Basic TreeNode library for npm projects:</h3>
 </div>
 <code class="scrollCodeBlockComponent">const {TreeNode} = require("jtree/products/TreeNode.js")
 const tree = new TreeNode("hello world")
 console.log(tree.toString())</code>
 
-<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">jtree base library for the browser:</h3>
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">Basic TreeNode library + Grammar Language for the browser:</h3>
 </div>
-<code class="scrollCodeBlockComponent">&lt;script src="https://jtree.treenotation.org/products/jtree.browser.js" /></code>
+<code class="scrollCodeBlockComponent">&lt;script src="../../products/Utils.browser.js">&lt;/script>
+&lt;script src="../../products/TreeNode.browser.js">&lt;/script>
+&lt;script src="../../products/GrammarLanguage.browser.js">&lt;/script></code>
 
 <div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">TreeBase</h4>
 </div>
