@@ -1,23 +1,23 @@
 <h1 class="scrollTitleComponent"><a href="languageChecklist.html">A checklist for creating a new Tree Language from Scratch</a></h1>
 
 
-<ul><li class="scrollParagraphComponent">☑️ Know where to get help. <a href="https://github.com/treenotation/jtree/issues">GitHub issues</a>, <a href="https://reddit.com/r/treenotation">Tree Notation subreddit</a>, <a href="mailto:treenotation@googlegroups.com">Google Groups</a>, or <a href="mailto:breck7@gmail.com">email Breck</a>.</li>
-<li class="scrollParagraphComponent">☑️ Take a look at some of the sample languages in the <a href="https://jtree.treenotation.org/designer/">Tree Language Designer</a>. You might be able to use these as a reference if you get stuck.</li>
-<li class="scrollParagraphComponent">☑️ Open the <a href="https://jtree.treenotation.org/designer/">Tree Language Designer</a> or use your own editor (note: only <a href="https://sublimetext.com">SublimeText4</a> currently has partial syntax highlighting for Grammar Languages).</li>
-<li class="scrollParagraphComponent">☑️ Name your language. For now, it is recommended that your language name be lowercase, only letters between A-Z, and not a common reserved word like "while/if/true/etc". You are free to name it anything you want, but if you do we ask that you report any bugs you encounter.</li>
-<li class="scrollParagraphComponent"><a href="https://jtree.treenotation.org/designer/">☑️ If you are using the Tree Language Designer, clear the boxes to create a new language from scratch. If you are using your own editor, create a new file with the name <code>{yourLanguageNameGoesHere}.grammar`</a</code></li>
-<li class="scrollParagraphComponent">☑️ Create a root nodeType. This will be the root node for your language. It should like this:</li></ul>
+<ul><li >☑️ Know where to get help. <a href="https://github.com/treenotation/jtree/issues">GitHub issues</a>, <a href="https://reddit.com/r/treenotation">Tree Notation subreddit</a>, <a href="mailto:treenotation@googlegroups.com">Google Groups</a>, or <a href="mailto:breck7@gmail.com">email Breck</a>.</li>
+<li >☑️ Take a look at some of the sample languages in the <a href="https://jtree.treenotation.org/designer/">Tree Language Designer</a>. You might be able to use these as a reference if you get stuck.</li>
+<li >☑️ Open the <a href="https://jtree.treenotation.org/designer/">Tree Language Designer</a> or use your own editor (note: only <a href="https://sublimetext.com">SublimeText4</a> currently has partial syntax highlighting for Grammar Languages).</li>
+<li >☑️ Name your language. For now, it is recommended that your language name be lowercase, only letters between A-Z, and not a common reserved word like "while/if/true/etc". You are free to name it anything you want, but if you do we ask that you report any bugs you encounter.</li>
+<li ><a href="https://jtree.treenotation.org/designer/">☑️ If you are using the Tree Language Designer, clear the boxes to create a new language from scratch. If you are using your own editor, create a new file with the name <code>{yourLanguageNameGoesHere}.grammar`</a</code></li>
+<li >☑️ Create a root nodeType. This will be the root node for your language. It should like this:</li></ul>
 
 <code class="scrollCodeBlockComponent">{yourLanguageNameGoesHere}Node
 root</code>
 
-<ul><li class="scrollParagraphComponent">☑️ Add a description line to your new root nodeType. This should describe what the purpose of your language is:</li></ul>
+<ul><li >☑️ Add a description line to your new root nodeType. This should describe what the purpose of your language is:</li></ul>
 
 <code class="scrollCodeBlockComponent">{yourLanguageNameGoesHere}Node
  root
  description {thisIsALangageToHelpYouDoX}</code>
 
-<ul><li class="scrollParagraphComponent">☑️ Add a top level nodeType to your language. In this example, we'll make a simple language that allows to store your friend's birthdays. Let's add a "friend" nodeType.</li></ul>
+<ul><li >☑️ Add a top level nodeType to your language. In this example, we'll make a simple language that allows to store your friend's birthdays. Let's add a "friend" nodeType.</li></ul>
 
 <code class="scrollCodeBlockComponent">birthdaysNode
  root
@@ -25,7 +25,7 @@ root</code>
 friendNode
  description Store information about a friend.</code>
 
-<ul><li class="scrollParagraphComponent">☑️ Now let's add an inScope line to the root node so that the friend node is in scope:</li></ul>
+<ul><li >☑️ Now let's add an inScope line to the root node so that the friend node is in scope:</li></ul>
 
 <code class="scrollCodeBlockComponent">birthdaysNode
  root
@@ -34,13 +34,13 @@ friendNode
 friendNode
  description Store information about a friend.</code>
 
-<ul><li class="scrollParagraphComponent">☑️ Now the following is a valid program in your language:</li></ul>
+<ul><li >☑️ Now the following is a valid program in your language:</li></ul>
 
 <code class="scrollCodeBlockComponent">friend
 friend
 friend</code>
 
-<ul><li class="scrollParagraphComponent">☑️ Now let's add a "name" nodeType under the friend nodeType's scope. We're start hiding some already mentioned code with "..." </li></ul>
+<ul><li >☑️ Now let's add a "name" nodeType under the friend nodeType's scope. We're start hiding some already mentioned code with "..." </li></ul>
 
 <code class="scrollCodeBlockComponent">...
 friendNode
@@ -48,7 +48,7 @@ friendNode
  inScope nameNode
 nameNode</code>
 
-<ul><li class="scrollParagraphComponent">☑️ Now the following is a valid program in your language:</li></ul>
+<ul><li >☑️ Now the following is a valid program in your language:</li></ul>
 
 <code class="scrollCodeBlockComponent">friend
  name
@@ -56,26 +56,26 @@ friend
  name
 ...</code>
 
-<ul><li class="scrollParagraphComponent">☑️ Now let's add a "cellType", which let's us start getting things like type checking, syntax highlighting, and autocomplete. By the <strong>current</strong> convention, we put the cellTypes at the top of our grammar file.</li></ul>
+<ul><li >☑️ Now let's add a "cellType", which let's us start getting things like type checking, syntax highlighting, and autocomplete. By the <strong>current</strong> convention, we put the cellTypes at the top of our grammar file.</li></ul>
 
 <code class="scrollCodeBlockComponent">nameCell
  highlightScope string
 ...</code>
 
-<ul><li class="scrollParagraphComponent">☑️ Now let's make the name nodeType accept a "catch all" cellType of the nameCell.</li></ul>
+<ul><li >☑️ Now let's make the name nodeType accept a "catch all" cellType of the nameCell.</li></ul>
 
 <code class="scrollCodeBlockComponent">...
 nameNode
  catchAllCellType nameCell</code>
 
-<ul><li class="scrollParagraphComponent">☑️ Now the following is a valid program in your language:</li></ul>
+<ul><li >☑️ Now the following is a valid program in your language:</li></ul>
 
 <code class="scrollCodeBlockComponent">friend
  name Ben Franklin
 friend
  name Ada Lovelace</code>
 
-<ul><li class="scrollParagraphComponent">☑️ Now let's add an error nodeType, and link it to the rootNode, to catch errors:</li></ul>
+<ul><li >☑️ Now let's add an error nodeType, and link it to the rootNode, to catch errors:</li></ul>
 
 <code class="scrollCodeBlockComponent">birthdaysNode
  root
@@ -85,7 +85,7 @@ friend
 errorNode
  baseNodeType errorNode</code>
 
-<ul><li class="scrollParagraphComponent">☑️ Now you should get an error for a program like this:</li></ul>
+<ul><li >☑️ Now you should get an error for a program like this:</li></ul>
 
 <code class="scrollCodeBlockComponent">frieeeend
  name Ben Franklin</code>
