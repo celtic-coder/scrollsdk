@@ -1740,8 +1740,8 @@ class TreeNode extends AbstractNode {
     return level
   }
 
-  clone(): TreeNode {
-    return new (<any>this.constructor)(this.childrenToString(), this.getLine())
+  clone(children = this.childrenToString(), line = this.getLine()): TreeNode {
+    return new (<any>this.constructor)(children, line)
   }
 
   hasFirstWord(firstWord: word): boolean {
@@ -2982,7 +2982,7 @@ class TreeNode extends AbstractNode {
     return str ? indent + str.replace(/\n/g, indent) : ""
   }
 
-  static getVersion = () => "65.2.0"
+  static getVersion = () => "65.3.0"
 
   static fromDisk(path: string): TreeNode {
     const format = this._getFileFormat(path)
