@@ -180,7 +180,7 @@ abstract class GrammarBackedNode extends TreeNode {
 
     const values = hits.map(colDef => {
       const node = this.getNode(colDef.columnName)
-      let content = node.getContent()
+      let content = node.content
       const hasChildren = node.length
       const isText = colDef.type === SQLiteTypes.text
       if (content && hasChildren) content = node.getContentWithChildren().replace(/\n/g, "\\n")
@@ -244,7 +244,7 @@ abstract class GrammarBackedNode extends TreeNode {
   }
 
   _getErrorNodeErrors() {
-    return [this.getFirstWord() ? new UnknownNodeTypeError(this) : new BlankLineError(this)]
+    return [this.firstWord ? new UnknownNodeTypeError(this) : new BlankLineError(this)]
   }
 
   _getBlobNodeCatchAllNodeType() {
@@ -280,7 +280,7 @@ abstract class GrammarBackedNode extends TreeNode {
   // some of the magic that makes this all work. but maybe there's a better way.
   getHandGrammarProgram(): HandGrammarProgram {
     if (this.isRoot()) throw new Error(`Root node without getHandGrammarProgram defined.`)
-    return (<any>this.getRootNode()).getHandGrammarProgram()
+    return (<any>this.root).getHandGrammarProgram()
   }
 
   getRunTimeEnumOptions(cell: AbstractGrammarBackedCell<any>): string[] {
@@ -362,7 +362,7 @@ abstract class GrammarBackedNode extends TreeNode {
           lineNumber: lineNumber,
           source: sourceNode.getIndentation() + sourceNode.getLine(),
           nodeType: sourceNode.constructor.name,
-          cellTypes: node.getContent(),
+          cellTypes: node.content,
           errorCount: errorCount
         }
         if (errorCount) obj.errorMessages = errs.map(err => err.getMessage()).join(";")
@@ -377,7 +377,7 @@ abstract class GrammarBackedNode extends TreeNode {
       new Set(
         this.getAllErrors()
           .filter(err => err instanceof UnknownNodeTypeError)
-          .map(err => err.getNode().getFirstWord())
+          .map(err => err.getNode().firstWord)
       )
     )
   }
@@ -479,9 +479,9 @@ abstract class GrammarBackedNode extends TreeNode {
     if (sortIndices.size) {
       // Sort keywords
       this.sort((nodeA: any, nodeB: any) => {
-        const aIndex = sortIndices.get(nodeA.getFirstWord())
-        const bIndex = sortIndices.get(nodeB.getFirstWord())
-        if (aIndex === undefined) console.error(`sortTemplate is missing "${nodeA.getFirstWord()}"`)
+        const aIndex = sortIndices.get(nodeA.firstWord)
+        const bIndex = sortIndices.get(nodeB.firstWord)
+        if (aIndex === undefined) console.error(`sortTemplate is missing "${nodeA.firstWord}"`)
 
         const a = aIndex ?? 1000
         const b = bIndex ?? 1000
@@ -491,7 +491,7 @@ abstract class GrammarBackedNode extends TreeNode {
       // pad sections
       let currentSection = 0
       this.forEach((node: any) => {
-        const nodeSection = sortSections.get(node.getFirstWord())
+        const nodeSection = sortSections.get(node.firstWord)
         const sectionHasAdvanced = nodeSection > currentSection
         if (sectionHasAdvanced) {
           currentSection = nodeSection
@@ -513,7 +513,7 @@ abstract class GrammarBackedNode extends TreeNode {
     })
     this.getTopDownArray<GrammarBackedNode>().forEach((node, lineNumber) => {
       const stats = usage.getNode(node.getNodeTypeId())
-      stats.appendLine([filepath + "-" + lineNumber, node.getWords().join(" ")].join(" "))
+      stats.appendLine([filepath + "-" + lineNumber, node.words.join(" ")].join(" "))
     })
     return usage
   }
@@ -568,14 +568,7 @@ abstract class GrammarBackedNode extends TreeNode {
   }
 
   createParser() {
-    return this.isRoot()
-      ? new TreeNode.Parser(BlobNode)
-      : new TreeNode.Parser(
-          this.getParent()
-            ._getParser()
-            ._getCatchAllNodeConstructor(this.getParent()),
-          {}
-        )
+    return this.isRoot() ? new TreeNode.Parser(BlobNode) : new TreeNode.Parser(this.parent._getParser()._getCatchAllNodeConstructor(this.parent), {})
   }
 
   getNodeTypeId(): treeNotationTypes.nodeTypeId {
@@ -594,7 +587,7 @@ abstract class GrammarBackedNode extends TreeNode {
 
   private get singleNodeUsedTwiceErrors() {
     const errors: treeNotationTypes.TreeError[] = []
-    const parent = this.getParent() as GrammarBackedNode
+    const parent = this.parent as GrammarBackedNode
     const hits = parent.getChildInstancesOfNodeTypeId(this.getDefinition().id)
 
     if (hits.length > 1)
@@ -606,7 +599,7 @@ abstract class GrammarBackedNode extends TreeNode {
 
   private get uniqueLineAppearsTwiceErrors() {
     const errors: treeNotationTypes.TreeError[] = []
-    const parent = this.getParent() as GrammarBackedNode
+    const parent = this.parent as GrammarBackedNode
     const hits = parent.getChildInstancesOfNodeTypeId(this.getDefinition().id)
 
     if (hits.length > 1) {
@@ -679,7 +672,7 @@ abstract class GrammarBackedNode extends TreeNode {
     const fields: any = {}
     this.forEach(node => {
       const def = node.getDefinition()
-      if (def.isRequired() || def.isSingle) fields[node.getWord(0)] = node.getContent()
+      if (def.isRequired() || def.isSingle) fields[node.getWord(0)] = node.content
     })
     return fields
   }
@@ -712,21 +705,21 @@ abstract class GrammarBackedNode extends TreeNode {
   }
 
   get list() {
-    return this.listDelimiter ? this.getContent().split(this.listDelimiter) : super.list
+    return this.listDelimiter ? this.content.split(this.listDelimiter) : super.list
   }
 
   get typedContent() {
     // todo: probably a better way to do this, perhaps by defining a cellDelimiter at the node level
     // todo: this currently parse anything other than string types
-    if (this.listDelimiter) return this.getContent().split(this.listDelimiter)
+    if (this.listDelimiter) return this.content.split(this.listDelimiter)
 
     const cells = this._getParsedCells()
     if (cells.length === 2) return cells[1].getParsed()
-    return this.getContent()
+    return this.content
   }
 
   get typedTuple() {
-    const key = this.getFirstWord()
+    const key = this.firstWord
     if (this.childrenAreTextBlob) return [key, this.childrenToString()]
 
     const { typedContent, contentKey, childrenKey } = this
@@ -907,7 +900,7 @@ abstract class AbstractGrammarBackedCell<T> {
 
   getAutoCompleteWords(partialWord: string = "") {
     const cellDef = this._getCellTypeDefinition()
-    let words = cellDef ? cellDef._getAutocompleteWordOptions(<GrammarBackedNode>this.getNode().getRootNode()) : []
+    let words = cellDef ? cellDef._getAutocompleteWordOptions(<GrammarBackedNode>this.getNode().root) : []
 
     const runTimeOptions = this.getNode().getRunTimeEnumOptions(this)
     if (runTimeOptions) words = runTimeOptions.concat(words)
@@ -975,7 +968,7 @@ ${options.toString(1)}`
     const runTimeOptions = this.getNode().getRunTimeEnumOptions(this)
     const word = this.getWord()
     if (runTimeOptions) return runTimeOptions.includes(word)
-    return this._getCellTypeDefinition().isValid(word, <GrammarBackedNode>this.getNode().getRootNode()) && this._isValid()
+    return this._getCellTypeDefinition().isValid(word, <GrammarBackedNode>this.getNode().root) && this._isValid()
   }
 
   getErrorIfAny(): treeNotationTypes.TreeError {
@@ -1342,16 +1335,16 @@ abstract class AbstractCellError extends AbstractTreeError {
 class UnknownNodeTypeError extends AbstractTreeError {
   getMessage(): string {
     const node = this.getNode()
-    const parentNode = node.getParent()
+    const parentNode = node.parent
     const options = parentNode._getParser().getFirstWordOptions()
-    return super.getMessage() + ` Invalid nodeType "${node.getFirstWord()}". Valid nodeTypes are: ${Utils._listToEnglishText(options, 7)}.`
+    return super.getMessage() + ` Invalid nodeType "${node.firstWord}". Valid nodeTypes are: ${Utils._listToEnglishText(options, 7)}.`
   }
 
   protected _getWordSuggestion() {
     const node = this.getNode()
-    const parentNode = node.getParent()
+    const parentNode = node.parent
     return Utils.didYouMean(
-      node.getFirstWord(),
+      node.firstWord,
       (<GrammarBackedNode>parentNode).getAutocompleteResults("", 0).map(option => option.text)
     )
   }
@@ -1360,7 +1353,7 @@ class UnknownNodeTypeError extends AbstractTreeError {
     const suggestion = this._getWordSuggestion()
     const node = this.getNode()
 
-    if (suggestion) return `Change "${node.getFirstWord()}" to "${suggestion}"`
+    if (suggestion) return `Change "${node.firstWord}" to "${suggestion}"`
 
     return ""
   }
@@ -1407,7 +1400,7 @@ class MissingRequiredNodeTypeError extends AbstractTreeError {
 
 class NodeTypeUsedMultipleTimesError extends AbstractTreeError {
   getMessage(): string {
-    return super.getMessage() + ` Multiple "${this.getNode().getFirstWord()}" found.`
+    return super.getMessage() + ` Multiple "${this.getNode().firstWord}" found.`
   }
 
   getSuggestionMessage() {
@@ -1495,7 +1488,7 @@ class GrammarRegexTestNode extends AbstractGrammarWordTestNode {
   private _regex: RegExp
 
   isValid(str: string) {
-    if (!this._regex) this._regex = new RegExp("^" + this.getContent() + "$")
+    if (!this._regex) this._regex = new RegExp("^" + this.content + "$")
     return !!str.match(this._regex)
   }
 }
@@ -1504,7 +1497,7 @@ class GrammarReservedWordsTestNode extends AbstractGrammarWordTestNode {
   private _set: Set<string>
 
   isValid(str: string) {
-    if (!this._set) this._set = new Set(this.getContent().split(" "))
+    if (!this._set) this._set = new Set(this.content.split(" "))
     return !this._set.has(str)
   }
 }
@@ -1574,7 +1567,7 @@ class cellTypeDefinitionNode extends AbstractExtendibleTreeNode {
   }
 
   _getIdToNodeMap() {
-    return (<HandGrammarProgram>this.getParent()).getCellTypeDefinitions()
+    return (<HandGrammarProgram>this.parent).getCellTypeDefinitions()
   }
 
   getGetter(wordIndex: number) {
@@ -1697,7 +1690,7 @@ abstract class AbstractCellParser {
   }
 
   getCellArray(node: GrammarBackedNode = undefined): AbstractGrammarBackedCell<any>[] {
-    const wordCount = node ? node.getWords().length : 0
+    const wordCount = node ? node.words.length : 0
     const def = this._definition
     const grammarProgram = def.getLanguageDefinitionProgram()
     const requiredCellTypeIds = this.getRequiredCellTypeIds()
@@ -1747,9 +1740,9 @@ class OmnifixCellParser extends AbstractCellParser {
   getCellArray(node: GrammarBackedNode = undefined): AbstractGrammarBackedCell<any>[] {
     const cells: AbstractGrammarBackedCell<any>[] = []
     const def = this._definition
-    const program = <GrammarBackedNode>(node ? node.getRootNode() : undefined)
+    const program = <GrammarBackedNode>(node ? node.root : undefined)
     const grammarProgram = def.getLanguageDefinitionProgram()
-    const words = node ? node.getWords() : []
+    const words = node ? node.words : []
     const requiredCellTypeDefs = this.getRequiredCellTypeIds().map(cellTypeId => grammarProgram.getCellTypeDefinitionById(cellTypeId))
     const catchAllCellTypeId = this.getCatchAllCellTypeId()
     const catchAllCellTypeDef = catchAllCellTypeId && grammarProgram.getCellTypeDefinitionById(catchAllCellTypeId)
@@ -2031,7 +2024,7 @@ ${properties.join("\n")}
   }
 
   getLanguageDefinitionProgram(): HandGrammarProgram {
-    return <HandGrammarProgram>this.getParent()
+    return <HandGrammarProgram>this.parent
   }
 
   protected _getCustomJavascriptMethods(): treeNotationTypes.javascriptCode {
@@ -2165,7 +2158,7 @@ ${properties.join("\n")}
   }
 
   private _getLanguageRootNode() {
-    return (<HandGrammarProgram>this.getParent()).getRootNodeTypeDefinitionNode()
+    return (<HandGrammarProgram>this.parent).getRootNodeTypeDefinitionNode()
   }
 
   private _isErrorNodeType() {
@@ -2230,11 +2223,7 @@ ${properties.join("\n")}
     const components = [this._getParserToJavascript(), this._getErrorMethodToJavascript(), this._getCellGettersAndNodeTypeConstants(), this._getCustomJavascriptMethods()].filter(identity => identity)
 
     if (this._amIRoot()) {
-      components.push(`static cachedHandGrammarProgramRoot = new HandGrammarProgram(\`${Utils.escapeBackTicks(
-        this.getParent()
-          .toString()
-          .replace(/\\/g, "\\\\")
-      )}\`)
+      components.push(`static cachedHandGrammarProgramRoot = new HandGrammarProgram(\`${Utils.escapeBackTicks(this.parent.toString().replace(/\\/g, "\\\\"))}\`)
         getHandGrammarProgram() {
           return this.constructor.cachedHandGrammarProgramRoot
       }`)
@@ -2517,7 +2506,7 @@ class HandGrammarProgram extends AbstractGrammarDefinitionNode {
       const exampleProgram = new programConstructor(code)
       exampleProgram.getTopDownArray().forEach((node: GrammarBackedNode) => {
         const nodeIndex = idToIndex[node.getDefinition()._getId()]
-        const parentNode = <GrammarBackedNode>node.getParent()
+        const parentNode = <GrammarBackedNode>node.parent
         if (!nodeIndex) return undefined
         if (parentNode.isRoot()) matrix[0][nodeIndex]++
         else {
@@ -2604,7 +2593,7 @@ class HandGrammarProgram extends AbstractGrammarDefinitionNode {
     const testBlocks: { [id: string]: Function } = {}
     this.getValidConcreteAndAbstractNodeTypeDefinitions().forEach(def =>
       def.getExamples().forEach(example => {
-        const id = def._getId() + example.getContent()
+        const id = def._getId() + example.content
         testBlocks[id] = (equal: Function) => {
           const exampleProgram = new programConstructor(example.childrenToString())
           const errors = exampleProgram.getAllErrors(example._getLineNumber() + 1)
@@ -2966,8 +2955,8 @@ class UnknownGrammarProgram extends TreeNode {
   private _renameIntegerKeywords(clone: UnknownGrammarProgram) {
     // todo: why are we doing this?
     for (let node of clone.getTopDownArrayIterator()) {
-      const firstWordIsAnInteger = !!node.getFirstWord().match(/^\d+$/)
-      const parentFirstWord = node.getParent().getFirstWord()
+      const firstWordIsAnInteger = !!node.firstWord.match(/^\d+$/)
+      const parentFirstWord = node.parent.firstWord
       if (firstWordIsAnInteger && parentFirstWord) node.setFirstWord(HandGrammarProgram.makeNodeTypeId(parentFirstWord + UnknownGrammarProgram._childSuffix))
     }
   }
@@ -2976,12 +2965,12 @@ class UnknownGrammarProgram extends TreeNode {
     const keywordsToChildKeywords: { [firstWord: string]: treeNotationTypes.stringMap } = {}
     const keywordsToNodeInstances: { [firstWord: string]: TreeNode[] } = {}
     for (let node of clone.getTopDownArrayIterator()) {
-      const firstWord = node.getFirstWord()
+      const firstWord = node.firstWord
       if (!keywordsToChildKeywords[firstWord]) keywordsToChildKeywords[firstWord] = {}
       if (!keywordsToNodeInstances[firstWord]) keywordsToNodeInstances[firstWord] = []
       keywordsToNodeInstances[firstWord].push(node)
       node.forEach((child: TreeNode) => {
-        keywordsToChildKeywords[firstWord][child.getFirstWord()] = true
+        keywordsToChildKeywords[firstWord][child.firstWord] = true
       })
     }
     return { keywordsToChildKeywords: keywordsToChildKeywords, keywordsToNodeInstances: keywordsToNodeInstances }
@@ -2995,7 +2984,7 @@ class UnknownGrammarProgram extends TreeNode {
     if (childNodeTypeIds.length) nodeDefNode.touchNode(GrammarConstants.inScope).setWordsFrom(1, childNodeTypeIds)
 
     const cellsForAllInstances = instances
-      .map(line => line.getContent())
+      .map(line => line.content)
       .filter(identity => identity)
       .map(line => line.split(edgeSymbol))
     const instanceCellCounts = new Set(cellsForAllInstances.map(cells => cells.length))
@@ -3034,7 +3023,7 @@ class UnknownGrammarProgram extends TreeNode {
     //if (!catchAllCellType && cellTypeIds.length === 1) nodeDefNode.set(GrammarConstants.cells, cellTypeIds[0])
 
     // Todo: add conditional frequencies
-    return nodeDefNode.getParent().toString()
+    return nodeDefNode.parent.toString()
   }
 
   //  inferGrammarFileForAnSSVLanguage(grammarName: string): string {

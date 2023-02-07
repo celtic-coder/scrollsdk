@@ -285,6 +285,29 @@ code {
 
 <p class="scrollParagraphComponent">Here's a list of the notable changes in JTree.</p>
 
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">66.0.0 2023-2-7</h3>
+<ul><li >⚠️ Legacy <code>products/jtree.browser.js</code> has been removed.</li>
+<li >⚠️ TreeNode: This is the first of the <strong>getter releases</strong>. Start the long overdue switch to Javascript getters for <code>get</code> methods with zero params.</li></ul>
+<table class="scrollTableComponent"><thead><tr><th>Before</th>
+
+<th>After</th>
+</tr></thead>
+<tbody><tr><td>getParent()</td>
+<td>parent</td>
+</tr>
+<tr><td>getContent()</td>
+<td>content</td>
+</tr>
+<tr><td>getRootNode()</td>
+<td>root</td>
+</tr>
+<tr><td>getWords()</td>
+<td>words</td>
+</tr>
+<tr><td>getFirstWord()</td>
+<td>firstWord</td>
+</tr></tbody></table>
+</div>
 <div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">65.4.0 2023-2-6</h3>
 <ul><li >🎉 Utils: Upstream <code>titleToPermalink</code> method from pldb</li></ul>
 </div>
