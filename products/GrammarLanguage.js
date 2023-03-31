@@ -16,16 +16,9 @@ var GrammarConstantsCompiler
   GrammarConstantsCompiler["joinChildrenWith"] = "joinChildrenWith"
   GrammarConstantsCompiler["closeChildren"] = "closeChildren"
 })(GrammarConstantsCompiler || (GrammarConstantsCompiler = {}))
-var SQLiteTypes
-;(function(SQLiteTypes) {
-  SQLiteTypes["integer"] = "INTEGER"
-  SQLiteTypes["float"] = "FLOAT"
-  SQLiteTypes["text"] = "TEXT"
-})(SQLiteTypes || (SQLiteTypes = {}))
 var GrammarConstantsMisc
 ;(function(GrammarConstantsMisc) {
   GrammarConstantsMisc["doNotSynthesize"] = "doNotSynthesize"
-  GrammarConstantsMisc["tableName"] = "tableName"
 })(GrammarConstantsMisc || (GrammarConstantsMisc = {}))
 var PreludeCellTypeIds
 ;(function(PreludeCellTypeIds) {
@@ -141,24 +134,6 @@ class GrammarBackedNode extends TreeNode {
   }
   get rootGrammarTree() {
     return this.definition.root
-  }
-  toSQLiteInsertStatement(id) {
-    const def = this.definition
-    const tableName = this.tableName || def.tableNameIfAny || def.id
-    const columns = def.sqliteTableColumns
-    const hits = columns.filter(colDef => this.has(colDef.columnName))
-    const values = hits.map(colDef => {
-      const node = this.getNode(colDef.columnName)
-      let content = node.content
-      const hasChildren = node.length
-      const isText = colDef.type === SQLiteTypes.text
-      if (content && hasChildren) content = node.contentWithChildren.replace(/\n/g, "\\n")
-      else if (hasChildren) content = node.childrenToString().replace(/\n/g, "\\n")
-      return isText || hasChildren ? `"${content}"` : content
-    })
-    hits.unshift({ columnName: "id", type: SQLiteTypes.text })
-    values.unshift(`"${id}"`)
-    return `INSERT INTO ${tableName} (${hits.map(col => col.columnName).join(",")}) VALUES (${values.join(",")});`
   }
   getAutocompleteResults(partialWord, cellIndex) {
     return cellIndex === 0 ? this._getAutocompleteResultsForFirstWord(partialWord) : this._getAutocompleteResultsForCell(partialWord, cellIndex)
@@ -680,9 +655,6 @@ class AbstractGrammarBackedCell {
   get definitionLineNumber() {
     return this._typeDef.lineNumber
   }
-  getSQLiteType() {
-    return SQLiteTypes.text
-  }
   get cellTypeId() {
     return this._cellTypeId
   }
@@ -813,9 +785,6 @@ class GrammarIntCell extends GrammarNumericCell {
   get regexString() {
     return "-?[0-9]+"
   }
-  getSQLiteType() {
-    return SQLiteTypes.integer
-  }
   get parsed() {
     const word = this.getWord()
     return parseInt(word)
@@ -828,9 +797,6 @@ class GrammarFloatCell extends GrammarNumericCell {
     const word = this.getWord()
     const num = parseFloat(word)
     return !isNaN(num) && /^-?\d*(\.\d+)?$/.test(word)
-  }
-  getSQLiteType() {
-    return SQLiteTypes.float
   }
   _synthesizeCell(seed) {
     return Utils.randomUniformFloat(parseFloat(this.min), parseFloat(this.max), seed).toString()
@@ -856,9 +822,6 @@ class GrammarBoolCell extends AbstractGrammarBackedCell {
     const word = this.getWord()
     const str = word.toLowerCase()
     return this._trues.has(str) || this._falses.has(str)
-  }
-  getSQLiteType() {
-    return SQLiteTypes.integer
   }
   _synthesizeCell() {
     return Utils.getRandomString(1, ["1", "true", "t", "yes", "0", "false", "f", "no"])
@@ -1529,28 +1492,6 @@ interface ${thisId} {
 ${properties.join("\n")}
 }`.trim()
   }
-  get tableNameIfAny() {
-    return this.getFrom(`${GrammarConstantsConstantTypes.string} ${GrammarConstantsMisc.tableName}`)
-  }
-  get sqliteTableColumns() {
-    return this._getConcreteNonErrorInScopeNodeDefinitions(this._getInScopeNodeTypeIds()).map(def => {
-      const firstNonKeywordCellType = def.cellParser.getCellArray()[1]
-      let type = firstNonKeywordCellType ? firstNonKeywordCellType.getSQLiteType() : SQLiteTypes.text
-      // For now if it can have children serialize it as text in SQLite
-      if (!def.isTerminalNodeType()) type = SQLiteTypes.text
-      return {
-        columnName: def.idWithoutSuffix,
-        type
-      }
-    })
-  }
-  toSQLiteTableSchema() {
-    const columns = this.sqliteTableColumns.map(columnDef => `${columnDef.columnName} ${columnDef.type}`)
-    return `create table ${this.tableNameIfAny || this.id} (
- id TEXT NOT NULL PRIMARY KEY,
- ${columns.join(",\n ")}
-);`
-  }
   get id() {
     return this.getWord(0)
   }
@@ -1690,8 +1631,7 @@ ${properties.join("\n")}
     // todo: return catch all?
     const def = this.programNodeTypeDefinitionCache[nodeTypeId]
     if (def) return def
-    // todo: cleanup
-    this.languageDefinitionProgram._addDefaultCatchAllBlobNode()
+    this.languageDefinitionProgram._addDefaultCatchAllBlobNode() // todo: cleanup. Why did I do this? Needs to be removed or documented.
     const nodeDef = this.languageDefinitionProgram.programNodeTypeDefinitionCache[nodeTypeId]
     if (!nodeDef) throw new Error(`No definition found for nodeType id "${nodeTypeId}". Node: \n---\n${this.asString}\n---`)
     return nodeDef
@@ -1851,14 +1791,15 @@ ${captures}
     return this._cache_ancestorNodeTypeIdsArray
   }
   get programNodeTypeDefinitionCache() {
-    if (!this._cache_nodeTypeDefinitions) this._cache_nodeTypeDefinitions = this.makeProgramNodeTypeDefinitionCache()
+    if (!this._cache_nodeTypeDefinitions) this._cache_nodeTypeDefinitions = this.isRoot || this.hasParserDefinitions ? this.makeProgramNodeTypeDefinitionCache() : this.parent.programNodeTypeDefinitionCache
     return this._cache_nodeTypeDefinitions
+  }
+  get hasParserDefinitions() {
+    return !!this.getChildrenByNodeConstructor(nodeTypeDefinitionNode).length
   }
   makeProgramNodeTypeDefinitionCache() {
     const scopedParsers = this.getChildrenByNodeConstructor(nodeTypeDefinitionNode)
-    const parentCache = this.parent.programNodeTypeDefinitionCache
-    if (!scopedParsers.length) return parentCache
-    const cache = Object.assign({}, parentCache)
+    const cache = Object.assign({}, this.parent.programNodeTypeDefinitionCache) // todo. We don't really need this. we should just lookup the parent if no local hits.
     scopedParsers.forEach(nodeTypeDefinitionNode => (cache[nodeTypeDefinitionNode.nodeTypeIdFromDefinition] = nodeTypeDefinitionNode))
     return cache
   }
@@ -1906,7 +1847,31 @@ ${cells.toString(1)}`
     if (tags && tags.includes(GrammarConstantsMisc.doNotSynthesize)) return false
     return true
   }
+  // Get all definitions in this current scope down, even ones that are scoped inside other definitions.
+  get inScopeAndDescendantDefinitions() {
+    return this.languageDefinitionProgram._collectAllDefinitions(Object.values(this.programNodeTypeDefinitionCache), [])
+  }
+  _collectAllDefinitions(defs, collection = []) {
+    defs.forEach(def => {
+      collection.push(def)
+      def._collectAllDefinitions(def.getChildrenByNodeConstructor(nodeTypeDefinitionNode), collection)
+    })
+    return collection
+  }
+  get cruxPath() {
+    const parentPath = this.parent.cruxPath
+    return (parentPath ? parentPath + " " : "") + this.cruxIfAny
+  }
+  get cruxPathAsColumnName() {
+    return this.cruxPath.replace(/ /g, "_")
+  }
+  // Get every definition that extends from this one, even ones that are scoped inside other definitions.
   get concreteDescendantDefinitions() {
+    const { inScopeAndDescendantDefinitions, id } = this
+    return Object.values(inScopeAndDescendantDefinitions).filter(def => def._doesExtend(id) && !def._isAbstract())
+  }
+  get concreteInScopeDescendantDefinitions() {
+    // Note: non-recursive.
     const defs = this.programNodeTypeDefinitionCache
     const id = this.id
     return Object.values(defs).filter(def => def._doesExtend(id) && !def._isAbstract())
@@ -1916,7 +1881,7 @@ ${cells.toString(1)}`
     nodeTypeIds.forEach(nodeTypeId => {
       const def = this.getNodeTypeDefinitionByNodeTypeId(nodeTypeId)
       if (def._isErrorNodeType()) return
-      else if (def._isAbstract()) def.concreteDescendantDefinitions.forEach(def => defs.push(def))
+      else if (def._isAbstract()) def.concreteInScopeDescendantDefinitions.forEach(def => defs.push(def))
       else defs.push(def)
     })
     return defs
@@ -1989,6 +1954,9 @@ class HandGrammarProgram extends AbstractGrammarDefinitionNode {
     }
     return this._cache_rootNodeTypeConstructor
   }
+  get cruxPath() {
+    return ""
+  }
   trainModel(programs, programConstructor = this.compileAndReturnRootConstructor()) {
     const nodeDefs = this.validConcreteAndAbstractNodeTypeDefinitions
     const nodeDefCountIncludingRoot = nodeDefs.length + 1
@@ -2025,7 +1993,7 @@ class HandGrammarProgram extends AbstractGrammarDefinitionNode {
     const predictions = predictionsVector.slice(1).map((count, index) => {
       const id = model.indexToId[index + 1]
       return {
-        id: id,
+        id,
         def: this.getNodeTypeDefinitionByNodeTypeId(id),
         count,
         prob: count / total
