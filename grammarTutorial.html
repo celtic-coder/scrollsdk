@@ -1,0 +1,121 @@
+<div class="scrollSectionComponent"><h1 class="scrollTitleComponent"><a href="grammarTutorial.html">Tutorial: create a new Tree Language using Grammar</a></h1>
+</div>
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">Key Concepts</h3>
+</div>
+<p class="scrollParagraphComponent"><strong>Tree Notation</strong> is a notation for human & machine friendly languages that are as simple as possible. Simplicity is measured by the count of the pieces: the fewer pieces to build a language the better. We call languages that use <em>Tree Notation</em> <strong>Tree Languages</strong>.</p>
+<p class="scrollParagraphComponent">A <em>Tree Notation</em> program is a string, a tree, and a spreadsheet all at the same time. You will often work treat your program as all 3, sometimes concurrently.</p>
+<p class="scrollParagraphComponent"><strong>Grammar</strong> is a <em>Tree Language</em> for building other <em>Tree Languages</em>. This tutorial walks you through building a very simple language in <em>Grammar</em>.</p>
+<p class="scrollParagraphComponent"><em>Grammar</em> has only two main concepts: <strong>Line Parsers</strong> and <strong>Cell Parsers</strong>. <em>Line Parsers</em> take a line(s) and handle it according to the definitions you write in your Grammar program. <em>Line Parsers</em> delegate the parsing of the individual words (aka cells) in these lines to <em>Cell Parsers</em>.</p>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Before you start:</h4>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item1"><label for="item1">Know where to get help. <a href="https://github.com/treenotation/jtree/issues">GitHub issues</a>, <a href="https://reddit.com/r/treenotation">Tree Notation subreddit</a>, <a href="mailto:treenotation@googlegroups.com">Google Groups</a>, or <a href="mailto:breck7@gmail.com">email Breck</a>.</label></div></p>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item2"><label for="item2">Take a look at some of the sample languages in the <a href="https://jtree.treenotation.org/designer/">Tree Language Designer</a>. You might be able to use these as a reference if you get stuck.</label></div></p>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item3"><label for="item3">Open the <a href="https://jtree.treenotation.org/designer/">Tree Language Designer</a> or use your own editor (note: only <a href="https://sublimetext.com">SublimeText4</a> currently has partial syntax highlighting for Grammar Languages).</label></div></p>
+</div>
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">Step 1</h3>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item4"><label for="item4">Name your language. For now, it is recommended that your language name be lowercase, only letters between A-Z, and not a common reserved word like "while/if/true/etc". You are free to name it anything you want, but if you do we ask that you report any bugs you encounter.</label></div></p>
+</div>
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">Step 2</h3>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item5"><label for="item5">If you are using the <a href="https://jtree.treenotation.org/designer/">Tree Language Designer</a>, clear the boxes to create a new language from scratch. If you are using your own editor, create a new file with the name <code>{yourLanguageNameGoesHere}.grammar</code></label></div></p>
+</div>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Step 3</h4>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item6"><label for="item6">Create your first lineParser. This will be the root parser for your language. It should like this:</label></div></p>
+<code class="scrollCodeBlockComponent">{yourLanguageNameGoesHere}Node
+ root</code>
+</div>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Step 4</h4>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item7"><label for="item7">Add a description line to your new lineParser. This should describe what the purpose of your language is:</label></div></p>
+<code class="scrollCodeBlockComponent">{yourLanguageNameGoesHere}Node
+ root
+ description {thisIsALangageToHelpYouDoX}</code>
+</div>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Step 5</h4>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item8"><label for="item8">Add a top level lineParser to your language. In this example, we'll make a simple language that allows to store your friend's birthdays. Let's add a "friend" lineParser. We add a line to the <code>friendNode</code> <code>cruxFromId</code>. Most Tree Languages are keyword based. Because the word <code>keyword</code> is currently a reserved language in many programming languages, we currently use the word <code>crux</code> to refer to the same concept. The line <code>cruxFromId</code> instructs the GrammarParser to extract the keyword from the id—<code>friendNode</code>. Ideally this will be cleaned up in a future version of Grammar.</label></div></p>
+<code class="scrollCodeBlockComponent">birthdaysNode
+ root
+ description A language for storing your friend's birthdays.
+friendNode
+ description Store information about a friend.
+ cruxFromId</code>
+</div>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Step 6</h4>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item9"><label for="item9">Now let's add an <code>inScope</code> line to the root lineParser so that the friend lineParser is in scope:</label></div></p>
+<code class="scrollCodeBlockComponent">birthdaysNode
+ root
+ description A language for storing your friend's birthdays.
+ inScope friendNode
+friendNode
+ description Store information about a friend.
+ cruxFromId</code>
+</div>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Step 7</h4>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item10"><label for="item10">Now the following is a valid program in your language:</label></div></p>
+<code class="scrollCodeBlockComponent">friend
+friend
+friend</code>
+</div>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Step 8</h4>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item11"><label for="item11">Now let's add a <code>nameNode</code> under the <code>friendNode</code>'s scope. [Code already covered in this tutorial will be represented with "..."]</label></div></p>
+<code class="scrollCodeBlockComponent">...
+friendNode
+ description Store information about a friend.
+ cruxFromId
+ inScope nameNode
+nameNode</code>
+</div>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Step 9</h4>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item12"><label for="item12">Now the following is a valid program in your language:</label></div></p>
+<code class="scrollCodeBlockComponent">friend
+ name
+friend
+ name
+...</code>
+</div>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Step 10</h4>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item13"><label for="item13">Now let's add a <code>CellParser</code> which let's us start getting things like type checking, syntax highlighting, and autocomplete. By the <strong>current</strong> convention, we put the CellParsers at the top of our grammar file.</label></div></p>
+<code class="scrollCodeBlockComponent">nameCell
+ highlightScope string
+...</code>
+</div>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Step 11</h4>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item14"><label for="item14">Now let's make <code>nameNode</code> accept a "catch all" cellParser of the <code>nameCell</code>.</label></div></p>
+<code class="scrollCodeBlockComponent">...
+nameNode
+ catchAllCellType nameCell</code>
+</div>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Step 12</h4>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item15"><label for="item15">Now the following is a valid program in your language:</label></div></p>
+<code class="scrollCodeBlockComponent">friend
+ name Ben Franklin
+friend
+ name Ada Lovelace</code>
+</div>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Step 13</h4>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item16"><label for="item16">Now let's add an error lineParser and link it to the lineParser to catch errors:</label></div></p>
+<code class="scrollCodeBlockComponent">birthdaysNode
+ root
+ description A language for storing your friend's birthdays.
+ inScope friendNode
+ catchAllNode errorNode
+errorNode
+ baseNode errorNode</code>
+<p class="scrollParagraphComponent"><div style="text-indent:0px;"><input type="checkbox"  id="item17"><label for="item17">Now you should get an error for a program like this:</label></div></p>
+<code class="scrollCodeBlockComponent">frieeeend
+ name Ben Franklin</code>
+</div>
+<div class="scrollSectionComponent"><h4 class="scrollParagraphComponent">Step 14</h4>
+<p class="scrollParagraphComponent">That's all for now! Let us know what you need to do next. Of course, we haven't really gotten to the fun stuff yet. Languages get really interesting once you start implementing the "interesting methods", like compile, execute, render, and format.</p>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => document.querySelectorAll(".scrollCodeBlockComponent").forEach(block =>
+ {
+  if (!navigator.clipboard) return
+  const button = document.createElement("span")
+  button.classList.add("scrollCopyButton")
+  block.appendChild(button)
+  button.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(block.innerText)
+    button.classList.add("scrollCopied")
+  })
+ }
+))
+</script>
