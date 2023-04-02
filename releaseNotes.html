@@ -315,6 +315,30 @@ code {
 <div class="scrollSectionComponent"><h1 class="scrollTitleComponent"><a href="releaseNotes.html">Release Notes</a></h1>
 </div><div class="scrollColumnsComponent" style="column-width:35ch;column-count:4;max-width:200ch;">
 <p class="scrollParagraphComponent">Here's a list of the notable changes in JTree.</p>
+<div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">73.0.0 2023-4-2</h3>
+<p class="scrollParagraphComponent">This is a major release with significant name breaks. All logic is the same but methods have been renamed to better express the core idea of Tree Languages as small simple parsers combined.</p>
+<ul style="text-indent:0px;"><li >⚠️ BREAKING:</li><ul style="text-indent:20px;"><li >Tree Langauges:</li><ul style="text-indent:40px;"><li >grammarNode, hakonNode, etc. > grammarParser, hakonParser</li></ul>
+<li >TreeNode</li><ul style="text-indent:40px;"><li >createParser > createParserCombinator</li>
+<li >getAncestorByNodeConstructor</li>
+<li >TreeNode.Parser > TreeNode.ParserCombinator</li>
+<li >getChildInstancesOfNodeTypeId > getChildInstancesOfParserId</li>
+<li >findAllNodesWithNodeType > findAllNodesWithParser</li></ul>
+<li >GrammarCompiler:</li><ul style="text-indent:40px;"><li >compileGrammarFileAtPathAndReturnRootConstructor > compileGrammarFileAtPathAndReturnRootParser</li></ul>
+<li >GrammarLanguage.ts:</li><ul style="text-indent:40px;"><li >rootNodeTypeDefinitionNode > rootParserDefinitionNode</li>
+<li >invalidNodeTypes > invalidParsers</li>
+<li >getNodeTypeUsage > getParserUsage</li>
+<li >asCellTypeTreeWithNodeConstructorNames > asCellTypeTreeWithParserIds</li>
+<li >toPreludeCellTypeTreeWithNodeConstructorNames > toPreludeCellTypeTreeWithParserIds</li>
+<li >asTreeWithNodeTypes > asTreeWithParsers</li>
+<li >nodeTypeId > parserId</li>
+<li >topNodeTypeDefinitions > topParserDefinitions</li>
+<li >nodeTypeFamilyTree > parserFamilyTree</li>
+<li >validConcreteAndAbstractNodeTypeDefinitions > validConcreteAndAbstractParserDefinitions</li>
+<li >rootNodeTypeId > rootParserId</li>
+<li >compileAndReturnRootConstructor > compileAndReturnRootParser</li></ul>
+<li >TreeComponentFramework:</li><ul style="text-indent:40px;"><li >AbstractTreeComponent > AbstractTreeComponentParser</li></ul></ul>
+<li >⚠️ BREAKING: See <a href="langs/grammar/relaseNotes.html">Grammar Release Notes</a> for upgrading Grammar files</li></ul>
+</div>
 <div class="scrollSectionComponent"><h3 class="scrollParagraphComponent">72.2.0 2023-3-31</h3>
 <ul style="text-indent:0px;"><li >🎉 improved <code>sortTemplate</code>. You can now use <code>sortKey</code> in addition to keywords.</li></ul>
 </div>
