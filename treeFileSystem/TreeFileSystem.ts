@@ -3,9 +3,11 @@ const path = require("path")
 
 import { treeNotationTypes } from "../products/treeNotationTypes"
 const { Disk } = require("../products/Disk.node.js")
+const { Utils } = require("../products/Utils.js")
 const { TreeNode } = require("../products/TreeNode.js")
 const { HandGrammarProgram } = require("../products/GrammarLanguage.js")
 const grammarParser = require("../products/grammar.nodejs.js")
+const { posix } = require("../products/Path.js")
 
 const GRAMMAR_EXTENSION = ".grammar"
 
@@ -31,6 +33,8 @@ interface Storage {
   list(absolutePath: string): string[]
   write(absolutePath: string, content: string): void
   getMTime(absolutePath: string): number
+  dirname(absolutePath: string): string
+  join(...absolutePath: string[]): string
 }
 
 class DiskWriter implements Storage {
@@ -55,6 +59,14 @@ class DiskWriter implements Storage {
 
   getMTime(absolutePath: string) {
     return this._read(absolutePath).mtimeMs
+  }
+
+  dirname(absolutePath: string) {
+    return path.dirname(absolutePath)
+  }
+
+  join(...segments: string[]) {
+    return path.join(...arguments)
   }
 }
 
@@ -82,6 +94,14 @@ class MemoryWriter implements Storage {
   getMTime() {
     return 1
   }
+
+  dirname(path: string) {
+    return posix.dirname(path)
+  }
+
+  join(...segments: string[]) {
+    return posix.join(...arguments)
+  }
 }
 
 class TreeFileSystem implements Storage {
@@ -100,6 +120,14 @@ class TreeFileSystem implements Storage {
 
   list(absolutePath: treeNotationTypes.filepath) {
     return this._storage.list(absolutePath)
+  }
+
+  dirname(absolutePath: string) {
+    return this._storage.dirname(absolutePath)
+  }
+
+  join(...segments: string[]) {
+    return this._storage.join(...segments)
   }
 
   getMTime(absolutePath: string) {
@@ -133,7 +161,7 @@ class TreeFileSystem implements Storage {
     if (_expandedImportCache[absoluteFilePath]) return _expandedImportCache[absoluteFilePath]
     // A regex to check if a multiline string has a line that starts with "import ".
     const importRegex = /^import /gm
-    const code = this._storage.read(absoluteFilePath)
+    const code = this.read(absoluteFilePath)
 
     if (!code.match(importRegex))
       return {
@@ -145,9 +173,10 @@ class TreeFileSystem implements Storage {
     const lines = code.split("\n")
     const replacements: { lineNumber: number; code: string }[] = []
     lines.forEach((line, lineNumber) => {
-      const folder = path.dirname(absoluteFilePath)
+      const folder = this.dirname(absoluteFilePath)
       if (line.match(importRegex)) {
-        const absoluteImportFilePath = path.join(folder, line.replace("import ", ""))
+        const relativeFilePath = line.replace("import ", "")
+        const absoluteImportFilePath = this.join(folder, relativeFilePath)
         const expandedFile = this._evaluateImports(absoluteImportFilePath)
         replacements.push({ lineNumber, code: expandedFile.code })
         importFilePaths.push(absoluteImportFilePath)

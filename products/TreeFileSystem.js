@@ -1,9 +1,11 @@
 const fs = require("fs")
 const path = require("path")
 const { Disk } = require("../products/Disk.node.js")
+const { Utils } = require("../products/Utils.js")
 const { TreeNode } = require("../products/TreeNode.js")
 const { HandGrammarProgram } = require("../products/GrammarLanguage.js")
 const grammarParser = require("../products/grammar.nodejs.js")
+const { posix } = require("../products/Path.js")
 const GRAMMAR_EXTENSION = ".grammar"
 class DiskWriter {
   constructor() {
@@ -26,6 +28,12 @@ class DiskWriter {
   getMTime(absolutePath) {
     return this._read(absolutePath).mtimeMs
   }
+  dirname(absolutePath) {
+    return path.dirname(absolutePath)
+  }
+  join(...segments) {
+    return path.join(...arguments)
+  }
 }
 class MemoryWriter {
   constructor(inMemoryFiles) {
@@ -45,6 +53,12 @@ class MemoryWriter {
   getMTime() {
     return 1
   }
+  dirname(path) {
+    return posix.dirname(path)
+  }
+  join(...segments) {
+    return posix.join(...arguments)
+  }
 }
 class TreeFileSystem {
   constructor(inMemoryFiles) {
@@ -63,6 +77,12 @@ class TreeFileSystem {
   }
   list(absolutePath) {
     return this._storage.list(absolutePath)
+  }
+  dirname(absolutePath) {
+    return this._storage.dirname(absolutePath)
+  }
+  join(...segments) {
+    return this._storage.join(...segments)
   }
   getMTime(absolutePath) {
     return this._storage.getMTime(absolutePath)
@@ -85,7 +105,7 @@ class TreeFileSystem {
     if (_expandedImportCache[absoluteFilePath]) return _expandedImportCache[absoluteFilePath]
     // A regex to check if a multiline string has a line that starts with "import ".
     const importRegex = /^import /gm
-    const code = this._storage.read(absoluteFilePath)
+    const code = this.read(absoluteFilePath)
     if (!code.match(importRegex))
       return {
         code,
@@ -95,9 +115,10 @@ class TreeFileSystem {
     const lines = code.split("\n")
     const replacements = []
     lines.forEach((line, lineNumber) => {
-      const folder = path.dirname(absoluteFilePath)
+      const folder = this.dirname(absoluteFilePath)
       if (line.match(importRegex)) {
-        const absoluteImportFilePath = path.join(folder, line.replace("import ", ""))
+        const relativeFilePath = line.replace("import ", "")
+        const absoluteImportFilePath = this.join(folder, relativeFilePath)
         const expandedFile = this._evaluateImports(absoluteImportFilePath)
         replacements.push({ lineNumber, code: expandedFile.code })
         importFilePaths.push(absoluteImportFilePath)

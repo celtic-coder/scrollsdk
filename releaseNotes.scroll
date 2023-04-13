@@ -4,6 +4,20 @@ startColumns 4
 
 * Here's a list of the notable changes in JTree.
 
+# 75.0.0 2023-4-13
+- 🏥 switch to Joyent's browserfied path module for TFS to allow for isomorphic path strings
+- ⚠️ BREAKING: (No one should be affected)
+ - If using TFS in the browser you also now need to include: `jtree/products/Path.js`
+
+# 74.3.1 2023-4-13
+- 🏥 fix path bugs in TFS
+
+# 74.3.0 2023-4-13
+- 🏥 better error messages in Disk to help track down a CI bug
+
+# 74.2.0 2023-4-12
+- 🎉 new library: `TreeFileSystem.broswer.js`
+
 # 74.1.1 2023-4-9
 - 🏥 bug fix in TFS
 
