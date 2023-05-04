@@ -37,7 +37,7 @@
     "mkdirp": "^2.1.6",
     "prettier": "^2.8.7",
     "recursive-readdir-sync": "^1.0.6",
-    "scroll-cli": "^69.2.0",
+    "scroll-cli": "^70.0.0",
     "superagent": "^8.0.9"
   },
   "devDependencies": {
